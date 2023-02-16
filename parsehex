@@ -67,7 +67,7 @@ def run():
             bin_str = str(bin(int(split_by_t[1], 16))[2:].zfill(32))
             return_string += split_bin(bin_str) + '\n'
         #with open(f"{file[:-4]}_parsed.txt", "w+") as f2: f2.write(return_string)
-        print(return_string)
+        print(return_string.strip())
 
 if __name__ == "__main__":
     run()
