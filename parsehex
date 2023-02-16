@@ -30,17 +30,25 @@ def split_bin(bs):
         ret += ' ' + bs[19:]
     return ret
 
-
-if __name__ == "__main__":
-    if len(sys.argv) <= 1: 
-        print("No file!")
+def run():
+    file = ""
+    showAddress = True
+    for arg in sys.argv[1:]:
+        if arg in ["-b", "-B"]:
+            showAddress = False
+        else:
+            if arg in ['/', '~']:
+                file = arg
+            else:
+                file = os.getcwd() + '/' + arg
+    if not file:
+        print("No file")
         return
-    if sys.argv[1][0] in ['/', '~']:
-        file = sys.argv[1]
-    else:
-        file = os.getcwd() + '/' + sys.argv[1]
+    if not os.path.isfile(file):
+        print("File does not exist")
+        return
     if file[-4:] != ".bin" :
-        print("Must be .bin file!")
+        print("Must be .bin file")
         return
     with open(file, "r") as f:
         string = f.read()
@@ -48,10 +56,11 @@ if __name__ == "__main__":
         arr = string.split('\n')
         for line in arr:
             split_by_t = line.split('\t')
-            if not split_by_t[0] or split_by_t[0] == '\n':
-                return_string += '\n'
-                continue
-            return_string += str(int(split_by_t[0], 16)) + ": "
+            if showAddress:
+                if not split_by_t[0] or split_by_t[0] == '\n':
+                    return_string += '\n'
+                    continue
+                return_string += str(int(split_by_t[0], 16)) + ": "
             if len(split_by_t) < 2:
                 return_string += '\n'
                 continue
@@ -59,3 +68,6 @@ if __name__ == "__main__":
             return_string += split_bin(bin_str) + '\n'
         #with open(f"{file[:-4]}_parsed.txt", "w+") as f2: f2.write(return_string)
         print(return_string)
+
+if __name__ == "__main__":
+    run()
