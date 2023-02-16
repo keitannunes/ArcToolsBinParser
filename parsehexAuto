@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+# import sys, os
+# using global to read files in current directory that end with .bin
+import glob
+def main():
+    mylist = [f for f in glob.glob("*.bin")]
+    print(mylist)
+    for file in mylist:
+        run(file)
+
+
+def split_bin(bs):
+    ret = bs[0:2]
+    if bs[0:2] == '00':
+        if bs[2] == '0':
+            ret += ' ' + bs[2]
+            ret += ' ' + bs[3:7]
+            ret += ' ' + bs[7:10]
+            ret += ' ' + bs[10:]
+        else:
+            ret += ' ' + bs[2:7]
+            ret += ' ' + bs[7:10]
+            ret += ' ' + bs[10:]
+    elif bs[0:2] == '01':
+        ret += ' ' + bs[2:]
+    elif bs[18] == '0':
+        ret += ' ' + bs[3:7]
+        ret += ' ' + bs[7:13]
+        ret += ' ' + bs[13:18]
+        ret += ' ' + bs[18]
+        ret += ' ' + bs[19:27]
+        ret += ' ' + bs[27:]
+    else:
+        ret += ' ' + bs[3:7]
+        ret += ' ' + bs[7:13]
+        ret += ' ' + bs[13:18]
+        ret += ' ' + bs[18]
+        ret += ' ' + bs[19:]
+    return ret
+
+def print_help():
+    print("""
+ 	   Argument        		Meaning
+     	   -b			Binary - Return binary only (No address)
+     	   -f			File - Write to file
+     	   -h			Help - give this list of options   
+
+usage: parsehex [-args] [file]
+"""
+)
+
+def run(file):
+
+    showAddress = True
+    toFile = True
+    # if len(sys.argv) == 1:
+    #     print_help()
+    #     return
+    # for arg in sys.argv[1:]:
+    #     if arg.lower() in ["-b", "--binary"]:
+    #         showAddress = False
+    #     elif arg.lower() in ["-f", "--file"]:
+    #         toFile = True
+    #     elif arg.lower() in ["-h", "--help"]:
+    #         print_help()
+    #         return
+    #     else:
+    #         if arg in ['/', '~']:
+    #             file = arg
+    #         else:
+    #             file = os.getcwd() + '/' + arg
+    # if not file:
+    #     print("No file")
+    #     return
+    # if not os.path.isfile(file):
+    #     print("File does not exist")
+    #     return
+    # if file[-4:] != ".bin":
+    #     print("Must be .bin file")
+    #     return
+    
+    with open(file, "r") as f:
+        string = f.read()
+        return_string = ""
+        arr = string.split('\n')
+        for line in arr:
+            split_by_t = line.split('\t')
+            if showAddress:
+                if not split_by_t[0] or split_by_t[0] == '\n':
+                    return_string += '\n'
+                    continue
+                return_string += str(int(split_by_t[0], 16)) + ": "
+            if len(split_by_t) < 2:
+                return_string += '\n'
+                continue
+            bin_str = str(bin(int(split_by_t[1], 16))[2:].zfill(32))
+            return_string += split_bin(bin_str) + '\n'
+        if toFile:
+            with open(f"{file[:-4]}_parsed.txt", "w+") as f2:
+                f2.write(return_string.strip())
+        else:
+            print(return_string.strip())
+
+
+if __name__ == "__main__":
+    main()
