@@ -90,7 +90,7 @@ def run():
                 if showAddress:
                     return_string = f"{int(split_by_t[0], 16)}: {split_bin(str(bin(int(split_by_t[1], 16))[2:].zfill(32)))}"
                 else: 
-                    return_string = print(split_bin(str(bin(int(split_by_t[1], 16))[2:].zfill(32))))
+                    return_string = split_bin(str(bin(int(split_by_t[1], 16))[2:].zfill(32)))
                 break
         else:
             return_string = ""
