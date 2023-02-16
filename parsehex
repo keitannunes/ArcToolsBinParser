@@ -38,7 +38,7 @@ def print_help():
      	   -f			File - Write to file
      	   -h			Help - give this list of options   
 
-usage: parse hex [-args] [file]
+usage: parsehex [-args] [file]
 """
 )
 
