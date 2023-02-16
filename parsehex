@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-import sys, os
+# import sys, os
+# using global to read files in current directory that end with .bin
+import glob
+def main():
+    mylist = [f for f in glob.glob("*.bin")]
+    print(mylist)
+    for file in mylist:
+        run(file)
 
 
 def split_bin(bs):
@@ -42,35 +49,36 @@ usage: parsehex [-args] [file]
 """
 )
 
-def run():
-    file = ""
+def run(file):
+
     showAddress = True
-    toFile = False
-    if len(sys.argv) == 1:
-        print_help()
-        return
-    for arg in sys.argv[1:]:
-        if arg.lower() in ["-b", "--binary"]:
-            showAddress = False
-        elif arg.lower() in ["-f", "--file"]:
-            toFile = True
-        elif arg.lower() in ["-h", "--help"]:
-            print_help()
-            return
-        else:
-            if arg in ['/', '~']:
-                file = arg
-            else:
-                file = os.getcwd() + '/' + arg
-    if not file:
-        print("No file")
-        return
-    if not os.path.isfile(file):
-        print("File does not exist")
-        return
-    if file[-4:] != ".bin":
-        print("Must be .bin file")
-        return
+    toFile = True
+    # if len(sys.argv) == 1:
+    #     print_help()
+    #     return
+    # for arg in sys.argv[1:]:
+    #     if arg.lower() in ["-b", "--binary"]:
+    #         showAddress = False
+    #     elif arg.lower() in ["-f", "--file"]:
+    #         toFile = True
+    #     elif arg.lower() in ["-h", "--help"]:
+    #         print_help()
+    #         return
+    #     else:
+    #         if arg in ['/', '~']:
+    #             file = arg
+    #         else:
+    #             file = os.getcwd() + '/' + arg
+    # if not file:
+    #     print("No file")
+    #     return
+    # if not os.path.isfile(file):
+    #     print("File does not exist")
+    #     return
+    # if file[-4:] != ".bin":
+    #     print("Must be .bin file")
+    #     return
+    
     with open(file, "r") as f:
         string = f.read()
         return_string = ""
@@ -95,4 +103,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    main()
