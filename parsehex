@@ -32,13 +32,16 @@ def split_bin(bs):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) <= 1: 
+        print("No file!")
+        return
     if sys.argv[1][0] in ['/', '~']:
         file = sys.argv[1]
     else:
         file = os.getcwd() + '/' + sys.argv[1]
     if file[-4:] != ".bin" :
-        raise IOError("BAD FILE")
-
+        print("Must be .bin file!")
+        return
     with open(file, "r") as f:
         string = f.read()
         return_string = ""
