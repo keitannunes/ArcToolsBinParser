@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import sys, os
 
-
 def split_bin(bs):
     ret = bs[0:2]
     if bs[0:2] == '00':
@@ -33,28 +32,26 @@ def split_bin(bs):
 
 def print_help():
     print("""
- 	   Argument        		Meaning
-     	   -b			Binary - Return binary only (No address)
-     	   -f			File - Write to file
-     	   -h			Help - give this list of options   
-           -a [addr]    Address - Returns a word starting at addr
+       Argument             Meaning
+        -b            Binary - Return binary only (No address)
+        -f            File - Write to file
+        -h            Help - give this list of options   
+        -a [addr]     Address - Returns a word starting at addr
 
-usage: parsehex [-args] [file]
-"""
-)
+usage: parsehex [-args] [file]""")
 
-def run():
+def main():
     file = ""
-    showAddress = True
+    show_address = True
     toFile = False
-    addr = None
+    start, end = -1, -1
     if len(sys.argv) == 1:
         print_help()
         return
     args = iter(sys.argv[1:])
     for arg in args:
         if arg.lower() in ["-b", "--binary"]:
-            showAddress = False
+            show_address = False
         elif arg.lower() in ["-f", "--file"]:
             toFile = True
         elif arg.lower() in ["-h", "--help"]:
@@ -62,15 +59,32 @@ def run():
             return
         elif arg.lower() in ["-a", "--address"]:
             try:
-                addr = int(next(args))
-            except:
+                addr = next(args)
+                if ':' in addr:
+                    if addr[0] == ':':
+                        start = 0
+                        end = int(addr[1:])
+                    elif addr[-1] == ':':
+                        start = int(addr[:-1])
+                        end = (2e32-1)//8 #max byte
+                    else:
+                        addr = addr.split(':')
+                        start = int(addr[0])
+                        end = int(addr[1])
+                else:
+                    start = int(addr)
+                    end = int(addr)
+            except ValueError:
                 print("Bad address")
                 return
         else:
-            if arg in ['/', '~']:
-                file = arg
-            else:
-                file = os.getcwd() + '/' + arg
+            if (arg == sys.argv[-1]): break
+            print("Bad argument")
+            return
+    if sys.argv[-1][0] in ['/', '~']:
+        file = arg
+    else:
+        file = os.getcwd() + '/' + sys.argv[-1]
     if not file:
         print("No file")
         return
@@ -83,36 +97,24 @@ def run():
     with open(file, "r") as f:
         string = f.read()
         arr = string.split('\n')
-        if addr:
-            for line in arr:
-                split_by_t = line.split('\t')
-                if len(split_by_t) < 2 or int(split_by_t[0], 16) != addr: continue
-                if showAddress:
-                    return_string = f"{int(split_by_t[0], 16)}: {split_bin(str(bin(int(split_by_t[1], 16))[2:].zfill(32)))}"
-                else: 
-                    return_string = split_bin(str(bin(int(split_by_t[1], 16))[2:].zfill(32)))
-                break
-        else:
-            return_string = ""
-            for line in arr:
-                split_by_t = line.split('\t')
-                if len(split_by_t) < 2: continue
-                if showAddress:
-                    if not split_by_t[0] or split_by_t[0] == '\n':
-                        return_string += '\n'
-                        continue
-                    return_string += str(int(split_by_t[0], 16)) + ": "
-                if len(split_by_t) < 2:
+        return_string = ""
+        for line in arr:
+            split_by_t = line.split('\t')
+            if len(split_by_t) < 2: continue
+            current_word = int(split_by_t[0], 16)
+            if start >= 0 and not start <= current_word <= end: continue #specified addr range
+            if show_address:
+                if not split_by_t[0] or split_by_t[0] == '\n':
                     return_string += '\n'
                     continue
-                bin_str = str(bin(int(split_by_t[1], 16))[2:].zfill(32))
-                return_string += split_bin(bin_str) + '\n'
+                return_string += f"{current_word}: "
+            bin_str = str(bin(int(split_by_t[1], 16))[2:].zfill(32))
+            return_string += split_bin(bin_str) + '\n'
         if toFile:
             with open(f"{file[:-4]}_parsed.txt", "w+") as f2:
                 f2.write(return_string.strip())
         else:
             print(return_string.strip())
 
-
 if __name__ == "__main__":
-    run()
+    main()
