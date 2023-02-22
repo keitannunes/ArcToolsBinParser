@@ -16,14 +16,14 @@ def split_bin(bs):
     elif bs[0:2] == '01':
         ret += ' ' + bs[2:]
     elif bs[18] == '0':
-        ret += ' ' + bs[3:7]
+        ret += ' ' + bs[2:7]
         ret += ' ' + bs[7:13]
         ret += ' ' + bs[13:18]
         ret += ' ' + bs[18]
         ret += ' ' + bs[19:27]
         ret += ' ' + bs[27:]
     else:
-        ret += ' ' + bs[3:7]
+        ret += ' ' + bs[2:7]
         ret += ' ' + bs[7:13]
         ret += ' ' + bs[13:18]
         ret += ' ' + bs[18]
